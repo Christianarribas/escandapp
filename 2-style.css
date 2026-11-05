@@ -1,0 +1,380 @@
+/* ============================================================
+   EscandApp - Hoja de estilos
+   Índice:
+     1. Variables y base
+     2. Cabecera y menú
+     3. Aviso de datos de ejemplo
+     4. Vistas y paneles
+     5. Tarjetas de resumen (Inicio)
+     6. Escandallos
+     7. Tabla de stock
+     8. Formularios y botones
+     9. Mensajes, alertas y pie
+    10. Adaptación a pantallas grandes
+   ============================================================ */
+
+/* ---------- 1. Variables y base ---------- */
+:root {
+  --color-fondo: #faf6f1;          /* crema suave */
+  --color-oscuro: #2b2b2b;         /* casi negro */
+  --color-primario: #b3541e;       /* terracota (cocina, brasa) */
+  --color-primario-claro: #e8b48f;
+  --color-acento: #3e6b4f;         /* verde (correcto, margen) */
+  --color-alerta: #b03a2e;         /* rojo (stock bajo) */
+  --color-tarjeta: #ffffff;
+  --color-borde: #e5ddd2;
+  --radio: 12px;
+  --sombra: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--color-fondo);
+  color: var(--color-oscuro);
+  line-height: 1.5;
+}
+
+/* ---------- 2. Cabecera y menú ---------- */
+.cabecera {
+  background: linear-gradient(135deg, #8a3d14, var(--color-primario));
+  color: #fff;
+  padding: 20px 16px 0;
+  text-align: center;
+}
+.cabecera__titulo { font-size: 1.7rem; letter-spacing: 0.5px; }
+.cabecera__lema {
+  font-size: 0.85rem;
+  opacity: 0.9;
+  margin: 4px 0 14px;
+}
+.menu {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;               /* en móvil el menú se puede deslizar */
+}
+.menu__boton {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  padding: 10px 2px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+/* La línea de la pestaña activa es un subrayado del propio texto:
+   mide exactamente lo que mide cada palabra, ni más ni menos */
+.menu__boton--activo {
+  color: #fff;
+  text-decoration: underline;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 5px;
+}
+
+/* ---------- 3. Aviso de datos de ejemplo ---------- */
+.aviso-ejemplo {
+  background: #fdf1d6;
+  color: #7a5a13;
+  border: 1px dashed #d9b45c;
+  border-radius: var(--radio);
+  font-size: 0.8rem;
+  text-align: center;
+  padding: 8px 12px;
+  margin: 12px auto 0;
+  max-width: 720px;
+  width: calc(100% - 32px);
+}
+
+/* ---------- 4. Vistas y paneles ---------- */
+.contenido {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 16px;
+}
+.vista { display: none; }
+.vista--activa { display: block; }
+.vista__titulo { font-size: 1.3rem; margin-bottom: 6px; }
+.vista__ayuda {
+  font-size: 0.85rem;
+  color: #6d6459;
+  margin-bottom: 12px;
+}
+.seccion__titulo {
+  font-size: 1rem;
+  margin: 20px 0 8px;
+  color: var(--color-primario);
+}
+.panel {
+  background: var(--color-tarjeta);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+  padding: 14px;
+  margin-bottom: 14px;
+}
+.panel__titulo { font-size: 0.95rem; margin-bottom: 10px; }
+.panel--formulario { border: 2px solid var(--color-primario-claro); }
+
+/* ---------- 5. Tarjetas de resumen (Inicio) ---------- */
+.tarjetas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;  /* dos columnas en móvil */
+  gap: 10px;
+}
+.tarjeta {
+  background: var(--color-tarjeta);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+  padding: 12px;
+  text-align: center;
+}
+.tarjeta__numero {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--color-primario);
+}
+.tarjeta__numero--verde { color: var(--color-acento); }
+.tarjeta__numero--rojo { color: var(--color-alerta); }
+.tarjeta__texto { font-size: 0.78rem; color: #6d6459; }
+
+/* ---------- 6. Escandallos ---------- */
+.plato {
+  background: var(--color-tarjeta);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+.plato__cabecera {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-size: 0.95rem;
+}
+.plato__nombre { font-weight: 700; }
+.plato__tipo {
+  font-size: 0.7rem;
+  background: var(--color-primario-claro);
+  color: var(--color-oscuro);
+  border-radius: 20px;
+  padding: 2px 8px;
+  margin-left: 6px;
+  white-space: nowrap;
+}
+.plato__cifras { text-align: right; font-size: 0.8rem; white-space: nowrap; }
+.plato__pvp { font-weight: 700; }
+.plato__margen { color: var(--color-acento); font-weight: 600; }
+.plato__detalle {
+  display: none;
+  border-top: 1px dashed var(--color-borde);
+  padding: 12px 14px;
+  font-size: 0.85rem;
+}
+.plato--abierto .plato__detalle { display: block; }
+.desglose {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 4px;
+}
+.desglose th, .desglose td {
+  text-align: left;
+  padding: 4px 6px;
+  border-bottom: 1px solid var(--color-borde);
+}
+.desglose th { font-size: 0.75rem; color: #6d6459; }
+.desglose td:last-child, .desglose th:last-child { text-align: right; }
+.desglose__merma { color: #8b8072; font-size: 0.75rem; }
+.plato__nota-merma {
+  font-size: 0.75rem;
+  color: #8b8072;
+  margin-bottom: 10px;
+}
+.plato__resumen-linea {
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 0;
+}
+.plato__nota-margen {
+  font-size: 0.75rem;
+  color: #8b8072;
+  margin-top: 8px;
+}
+.plato__foodcost--alto { color: var(--color-alerta); font-weight: 600; }
+.plato__acciones { margin-top: 10px; text-align: right; }
+
+/* ---------- 7. Tabla de stock ---------- */
+.tabla-stock {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-tarjeta);
+  border-radius: var(--radio);
+  overflow: hidden;
+  box-shadow: var(--sombra);
+  font-size: 0.85rem;
+}
+.tabla-stock th, .tabla-stock td {
+  padding: 8px 10px;
+  text-align: left;
+  border-bottom: 1px solid var(--color-borde);
+}
+.tabla-stock th {
+  background: #f3ece2;
+  font-size: 0.75rem;
+  color: #6d6459;
+}
+.tabla-stock td:last-child, .tabla-stock th:last-child { text-align: right; }
+.tabla-stock__formato { color: #8b8072; font-size: 0.75rem; }
+.estado { font-weight: 700; font-size: 0.75rem; }
+.estado--ok { color: var(--color-acento); }
+.estado--bajo { color: var(--color-alerta); }
+.boton-editar {
+  border: 1px solid var(--color-borde);
+  background: #fff;
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+/* ---------- 8. Formularios y botones ---------- */
+.formulario {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: flex-end;
+}
+.formulario--vertical { flex-direction: column; align-items: stretch; }
+.formulario__campo {
+  flex: 1;
+  min-width: 100px;
+  padding: 9px 10px;
+  border: 1px solid var(--color-borde);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: #fff;
+}
+/* Los desplegables ocupan toda la línea: así no se cortan los nombres en móvil */
+select.formulario__campo { flex: 1 1 100%; }
+.campo--estrecho { flex: 0 1 110px; }
+.campo { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.campo__etiqueta { font-size: 0.78rem; color: #6d6459; font-weight: 600; }
+.boton {
+  padding: 9px 14px;
+  border: 1px solid transparent;  /* misma altura que los botones con borde (Cancelar) */
+
+  border-radius: 8px;
+  background: var(--color-primario);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.boton--secundario {
+  background: #fff;
+  color: var(--color-primario);
+  border: 1px solid var(--color-primario);
+  margin-bottom: 12px;
+}
+/* En una fila de formulario (Guardar + Cancelar) no lleva margen abajo:
+   con él, Cancelar quedaba más alto que Guardar */
+.formulario .boton--secundario { margin-bottom: 0; }
+/* Acción destructiva (Eliminar plato): mismo tamaño de caja, avisa en rojo */
+.boton--peligro {
+  background: #fff;
+  color: var(--color-alerta);
+  border: 1px solid var(--color-alerta);
+  margin-bottom: 0;
+}
+.boton:active { transform: scale(0.97); }
+.boton:focus-visible, .menu__boton:focus-visible, .plato__cabecera:focus-visible,
+.boton-editar:focus-visible {
+  outline: 3px solid #f2c94c;       /* foco visible solo con teclado */
+  outline-offset: 2px;
+}
+
+/* Líneas de ingrediente dentro del formulario de plato */
+.linea-receta {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+/* flex: 1 1 0 + min-width: 0 deja que el desplegable se encoja en móvil: con 55%
+   un nombre largo ("Pechuga de pollo (kg)") empujaba el formulario fuera de pantalla */
+.linea-receta select { flex: 1 1 0; min-width: 0; width: 0; }
+.linea-receta input { flex: 0 1 90px; min-width: 0; }
+.linea-receta__quitar {
+  flex: 0 0 auto;
+  border: none;
+  background: none;
+  color: var(--color-alerta);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 6px 10px;  /* zona de pulsación cómoda en móvil */
+  align-self: center;
+}
+.vista-previa {
+  font-size: 0.85rem;
+  color: var(--color-acento);
+}
+
+/* ---------- 9. Mensajes, alertas y pie ---------- */
+.alerta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  background: #fdecea;
+  border: 1px solid #f0c1bb;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 6px;
+  font-size: 0.85rem;
+}
+.alerta__cantidad { color: var(--color-alerta); font-weight: 700; white-space: nowrap; }
+.sin-alertas { font-size: 0.85rem; color: var(--color-acento); }
+.movimiento {
+  font-size: 0.82rem;
+  color: #4d463d;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--color-borde);
+}
+.movimiento__fecha { color: #8b8072; font-size: 0.75rem; }
+.mensaje {
+  margin-top: 12px;
+  margin-bottom: 12px;
+  background: #e8f3ec;
+  border: 1px solid #bfe0cc;
+  color: var(--color-acento);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.85rem;
+}
+.mensaje--error {
+  background: #fdecea;
+  border-color: #f0c1bb;
+  color: var(--color-alerta);
+}
+.pie {
+  text-align: center;
+  font-size: 0.75rem;
+  color: #8b8072;
+  padding: 20px 12px 28px;
+}
+
+/* ---------- 10. Adaptación a pantallas grandes ---------- */
+@media (min-width: 720px) {
+  .tarjetas { grid-template-columns: repeat(4, 1fr); } /* cuatro columnas en PC */
+  .cabecera__titulo { font-size: 2rem; }
+}
