@@ -284,7 +284,7 @@ function pintarEscandallos(idAbierto) {
           (hayMerma ? '<p class="plato__nota-merma">Los costes ya incluyen la merma.</p>' : "") +
           '<div class="plato__resumen-linea"><span>Coste por ración</span><strong>' + euros(cal.costeTotal) + "</strong></div>" +
           '<div class="plato__resumen-linea"><span>Precio de venta (sin IVA)</span><strong>' + euros(plato.precioVenta) + "</strong></div>" +
-          '<div class="plato__resumen-linea"><span>Food cost</span><strong class="' + claseFoodCost + '">' +
+          '<div class="plato__resumen-linea"><span>Coste de ingredientes</span><strong class="' + claseFoodCost + '">' +
             numero(cal.foodCost) + " %</strong></div>" +
           '<div class="plato__resumen-linea"><span>Margen bruto por ración</span><strong>' + euros(cal.margenBruto) + "</strong></div>" +
           '<p class="plato__nota-margen">Margen bruto = precio menos ingredientes, todo sin IVA. No es el beneficio: no cuenta personal, luz, alquiler ni otros costes.</p>' +
@@ -339,7 +339,7 @@ function actualizarVistaPreviaPlato() {
   const platoProvisional = { precioVenta: precio, ingredientes: lineas };
   const cal = calcularEscandallo(platoProvisional);
   caja.textContent = "Coste por ración: " + euros(cal.costeTotal) +
-    " · Food cost: " + numero(cal.foodCost) + " % · Margen bruto: " + euros(cal.margenBruto);
+    " · Coste de ingredientes: " + numero(cal.foodCost) + " % · Margen bruto: " + euros(cal.margenBruto);
 }
 
 function leerLineasReceta() {
@@ -704,7 +704,7 @@ function registrarConsumoIngrediente() {
 function guardarAjustes() {
   const umbral = leerNumero("ajuste-umbral");
   if (!umbral || umbral <= 0 || umbral >= 100) {
-    return mostrarMensaje("ajustes-mensaje", "El food cost de referencia tiene que estar entre 1 y 99.", true);
+    return mostrarMensaje("ajustes-mensaje", "El porcentaje de referencia tiene que estar entre 1 y 99.", true);
   }
   datos.ajustes.umbralFoodCost = umbral;
   guardarDatos();
