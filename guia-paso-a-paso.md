@@ -47,7 +47,7 @@ Para cada plato:
 
 1. Para cada línea de la receta, calcula la cantidad bruta y la multiplica por el precio por unidad → coste de ese ingrediente.
 2. Suma todo → **coste por ración**.
-3. **Food cost** = coste / precio de venta × 100 (se marca en rojo si pasa del umbral de Ajustes).
+3. **Coste de ingredientes** (en hostelería se suele llamar «food cost») = coste / precio de venta × 100 (se marca en rojo si pasa del umbral de Ajustes).
 4. **Margen bruto** = precio de venta − coste.
 
 Todos los precios son **sin IVA**, tanto compras como ventas, para que la resta sea coherente. El margen bruto NO es el beneficio: no cuenta personal, luz, alquiler ni otros costes.
