@@ -26,29 +26,28 @@
    - formato: cómo se compra. Ej.: vino en botella de 0,75 L a 3,50 €.
      El precio por unidad se calcula: precio del formato / cantidad del formato. */
 const DATOS_EJEMPLO = {
-  ejemploEnUso: true, // mientras sea true, se muestra el aviso de datos ficticios
   ajustes: { umbralFoodCost: 35 }, // referencia de demostración, configurable en Ajustes
   ingredientes: [
-    { id: "pollo",   nombre: "Pechuga de pollo", unidad: "kg", merma: 10, stock: 4.2,  minimo: 2,
+    { id: "pollo", ejemplo: true,   nombre: "Pechuga de pollo", unidad: "kg", merma: 10, stock: 4.2,  minimo: 2,
       formato: { nombre: "kg", cantidad: 1, precio: 6.50 } },
-    { id: "patatas", nombre: "Patatas", unidad: "kg", merma: 15, stock: 12, minimo: 5,
+    { id: "patatas", ejemplo: true, nombre: "Patatas", unidad: "kg", merma: 15, stock: 12, minimo: 5,
       formato: { nombre: "kg", cantidad: 1, precio: 1.20 } },
-    { id: "aceite",  nombre: "Aceite de oliva", unidad: "L", merma: 0, stock: 3.5, minimo: 2,
+    { id: "aceite", ejemplo: true,  nombre: "Aceite de oliva", unidad: "L", merma: 0, stock: 3.5, minimo: 2,
       formato: { nombre: "botella de 1 L", cantidad: 1, precio: 7.80 } },
-    { id: "huevos",  nombre: "Huevos", unidad: "unidad", merma: 0, stock: 30, minimo: 12,
+    { id: "huevos", ejemplo: true,  nombre: "Huevos", unidad: "unidad", merma: 0, stock: 30, minimo: 12,
       formato: { nombre: "docena", cantidad: 12, precio: 2.64 } },
-    { id: "pan",     nombre: "Pan de barra", unidad: "unidad", merma: 5, stock: 6, minimo: 8,
+    { id: "pan", ejemplo: true,     nombre: "Pan de barra", unidad: "unidad", merma: 5, stock: 6, minimo: 8,
       formato: { nombre: "barra", cantidad: 1, precio: 0.60 } },
-    { id: "vino",    nombre: "Vino tinto", unidad: "L", merma: 0, stock: 6.75, minimo: 4.5,
+    { id: "vino", ejemplo: true,    nombre: "Vino tinto", unidad: "L", merma: 0, stock: 6.75, minimo: 4.5,
       formato: { nombre: "botella de 75 cl", cantidad: 0.75, precio: 3.50 } },
-    { id: "ternera", nombre: "Ternera (carrilleras)", unidad: "kg", merma: 8, stock: 1.5, minimo: 2,
+    { id: "ternera", ejemplo: true, nombre: "Ternera (carrilleras)", unidad: "kg", merma: 8, stock: 1.5, minimo: 2,
       formato: { nombre: "kg", cantidad: 1, precio: 11.90 } },
-    { id: "nata",    nombre: "Nata para cocinar", unidad: "L", merma: 0, stock: 2, minimo: 1,
+    { id: "nata", ejemplo: true,    nombre: "Nata para cocinar", unidad: "L", merma: 0, stock: 2, minimo: 1,
       formato: { nombre: "brik de 1 L", cantidad: 1, precio: 3.10 } }
   ],
   platos: [
     {
-      id: "carrilleras", nombre: "Carrilleras al vino tinto", tipo: "Plato",
+      id: "carrilleras", ejemplo: true, nombre: "Carrilleras al vino tinto", tipo: "Plato",
       precioVenta: 14.50,
       ingredientes: [
         { ingredienteId: "ternera", cantidad: 0.35 },
@@ -58,7 +57,7 @@ const DATOS_EJEMPLO = {
       ]
     },
     {
-      id: "pollo-asado", nombre: "Pollo asado con patatas", tipo: "Plato",
+      id: "pollo-asado", ejemplo: true, nombre: "Pollo asado con patatas", tipo: "Plato",
       precioVenta: 11.00,
       ingredientes: [
         { ingredienteId: "pollo",   cantidad: 0.30 },
@@ -67,7 +66,7 @@ const DATOS_EJEMPLO = {
       ]
     },
     {
-      id: "tortilla", nombre: "Pincho de tortilla", tipo: "Pincho",
+      id: "tortilla", ejemplo: true, nombre: "Pincho de tortilla", tipo: "Pincho",
       precioVenta: 2.20,
       ingredientes: [
         { ingredienteId: "huevos",  cantidad: 1.5 },
@@ -77,7 +76,7 @@ const DATOS_EJEMPLO = {
       ]
     },
     {
-      id: "flan", nombre: "Flan casero", tipo: "Postre",
+      id: "flan", ejemplo: true, nombre: "Flan casero", tipo: "Postre",
       precioVenta: 3.50,
       ingredientes: [
         { ingredienteId: "huevos", cantidad: 1 },
@@ -85,7 +84,7 @@ const DATOS_EJEMPLO = {
       ]
     },
     {
-      id: "copa-vino", nombre: "Copa de vino tinto", tipo: "Bebida",
+      id: "copa-vino", ejemplo: true, nombre: "Copa de vino tinto", tipo: "Bebida",
       precioVenta: 2.80,
       ingredientes: [
         { ingredienteId: "vino", cantidad: 0.15 }
@@ -124,6 +123,12 @@ function conUnidad(n, unidad) {
   if (unidad === "unidad") return numero(n) + (n === 1 ? " unidad" : " unidades");
   return numero(n) + " " + unidad;
 }
+// Escapa texto antes de meterlo en innerHTML: los nombres pueden venir del usuario o de una copia importada
+function esc(t) {
+  return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+                  .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+
 function buscarIngrediente(id) {
   return datos.ingredientes.find(function (ing) { return ing.id === id; });
 }
@@ -172,6 +177,9 @@ function cantidadBruta(cantidadNeta, ing) {
 function calcularEscandallo(plato) {
   const desglose = plato.ingredientes.map(function (linea) {
     const ing = buscarIngrediente(linea.ingredienteId);
+    if (!ing) { // no debería pasar (las copias se validan), pero que no rompa la app
+      return { nombre: "(ingrediente no encontrado)", cantidadNeta: linea.cantidad, cantidadBruta: linea.cantidad, merma: 0, unidad: "", coste: 0 };
+    }
     const bruta = cantidadBruta(linea.cantidad, ing);
     return {
       nombre: ing.nombre,
@@ -222,7 +230,7 @@ function pintarInicio() {
 
   document.getElementById("lista-alertas").innerHTML = bajos.length
     ? bajos.map(function (ing) {
-        return '<div class="alerta"><span>' + ing.nombre + '</span>' +
+        return '<div class="alerta"><span>' + esc(ing.nombre) + '</span>' +
                '<span class="alerta__cantidad">quedan ' + conUnidad(ing.stock, ing.unidad) +
                " (mínimo " + numero(ing.minimo) + ")</span></div>";
       }).join("")
@@ -231,7 +239,7 @@ function pintarInicio() {
   const ultimos = datos.movimientos.slice(-5).reverse();
   document.getElementById("lista-movimientos").innerHTML = ultimos.length
     ? ultimos.map(function (m) {
-        return '<div class="movimiento">' + m.texto +
+        return '<div class="movimiento">' + esc(m.texto) +
                ' <span class="movimiento__fecha">(' + m.fecha + ")</span></div>";
       }).join("")
     : '<p class="sin-alertas">Aún no hay movimientos registrados.</p>';
@@ -245,6 +253,11 @@ function tarjeta(num, texto, claseExtra) {
 /* ---------- 8. Pintar: Escandallos ---------- */
 function pintarEscandallos(idAbierto) {
   const umbral = datos.ajustes.umbralFoodCost;
+  if (!datos.platos.length) {
+    document.getElementById("lista-escandallos").innerHTML =
+      '<p class="vista__ayuda">Aún no hay escandallos. Crea el primero con «+ Nuevo plato o bebida».</p>';
+    return;
+  }
   document.getElementById("lista-escandallos").innerHTML = datos.platos.map(function (plato) {
     const cal = calcularEscandallo(plato);
     const abierto = plato.id === idAbierto;
@@ -254,14 +267,14 @@ function pintarEscandallos(idAbierto) {
       const notaMerma = l.merma > 0
         ? ' <span class="desglose__merma">(+' + numero(l.merma) + " % merma: salen " + conUnidad(l.cantidadBruta, l.unidad) + ")</span>"
         : "";
-      return "<tr><td>" + l.nombre + "</td><td>" + conUnidad(l.cantidadNeta, l.unidad) + notaMerma +
+      return "<tr><td>" + esc(l.nombre) + "</td><td>" + conUnidad(l.cantidadNeta, l.unidad) + notaMerma +
              "</td><td>" + euros(l.coste) + "</td></tr>";
     }).join("");
     return (
-      '<article class="plato' + (abierto ? " plato--abierto" : "") + '" data-plato="' + plato.id + '">' +
+      '<article class="plato' + (abierto ? " plato--abierto" : "") + '" data-plato="' + esc(plato.id) + '">' +
         '<button class="plato__cabecera" type="button">' +
-          '<span><span class="plato__nombre">' + plato.nombre + '</span>' +
-          '<span class="plato__tipo">' + plato.tipo + "</span></span>" +
+          '<span><span class="plato__nombre">' + esc(plato.nombre) + '</span>' +
+          '<span class="plato__tipo">' + esc(plato.tipo) + "</span></span>" +
           '<span class="plato__cifras"><span class="plato__pvp">' + euros(plato.precioVenta) + "</span><br>" +
           '<span class="plato__margen">margen bruto ' + euros(cal.margenBruto) + "</span></span>" +
         "</button>" +
@@ -275,7 +288,7 @@ function pintarEscandallos(idAbierto) {
             numero(cal.foodCost) + " %</strong></div>" +
           '<div class="plato__resumen-linea"><span>Margen bruto por ración</span><strong>' + euros(cal.margenBruto) + "</strong></div>" +
           '<p class="plato__nota-margen">Margen bruto = precio menos ingredientes, todo sin IVA. No es el beneficio: no cuenta personal, luz, alquiler ni otros costes.</p>' +
-          '<div class="plato__acciones"><button class="boton-editar" data-editar-plato="' + plato.id + '" type="button">Editar</button></div>' +
+          '<div class="plato__acciones"><button class="boton-editar" data-editar-plato="' + esc(plato.id) + '" type="button">Editar</button></div>' +
         "</div>" +
       "</article>"
     );
@@ -299,7 +312,7 @@ let platoEditando = null; // id del plato que se edita, o null si es nuevo
 function opcionesIngredientes(valorSeleccionado) {
   return datos.ingredientes.map(function (ing) {
     const sel = ing.id === valorSeleccionado ? " selected" : "";
-    return '<option value="' + ing.id + '"' + sel + ">" + ing.nombre + " (" + ing.unidad + ")</option>";
+    return '<option value="' + esc(ing.id) + '"' + sel + ">" + esc(ing.nombre) + " (" + esc(ing.unidad) + ")</option>";
   }).join("");
 }
 
@@ -376,7 +389,7 @@ function guardarPlato() {
     apuntarMovimiento("Editado el escandallo de " + nombre);
   } else {
     const id = "plato-" + Date.now();
-    datos.platos.push({ id: id, nombre: nombre, tipo: tipo, precioVenta: precio, ingredientes: lineas });
+    datos.platos.push({ id: id, ejemplo: false, nombre: nombre, tipo: tipo, precioVenta: precio, ingredientes: lineas });
     apuntarMovimiento("Nuevo escandallo: " + nombre);
   }
   guardarDatos();
@@ -386,14 +399,24 @@ function guardarPlato() {
 
 /* ---------- 10. Pintar: Stock ---------- */
 function pintarStock() {
+  if (!datos.ingredientes.length) {
+    document.getElementById("tabla-stock").innerHTML =
+      '<p class="vista__ayuda">No hay ingredientes. Añade el primero con «+ Nuevo ingrediente».</p>';
+    ["entrada-ingrediente", "recuento-ingrediente", "consumo-ingrediente"].forEach(function (id) {
+      document.getElementById(id).innerHTML = "";
+    });
+    return;
+  }
   const filas = datos.ingredientes.map(function (ing) {
     const bajo = ing.stock < ing.minimo;
-    return "<tr><td>" + ing.nombre + '<br><span class="tabla-stock__formato">' +
-           ing.formato.nombre + " a " + euros(ing.formato.precio) + "</span></td>" +
+    return "<tr><td>" + esc(ing.nombre) + '<br><span class="tabla-stock__formato">' +
+           esc(ing.formato.nombre) + " a " + euros(ing.formato.precio) + "</span></td>" +
            "<td>" + stockConFormato(ing) + "</td>" +
            "<td>" + numero(ing.minimo) + "</td>" +
            '<td><span class="estado ' + (bajo ? "estado--bajo" : "estado--ok") + '">' +
-           (bajo ? "BAJO" : "OK") + '</span> <button class="boton-editar" data-editar-ing="' + ing.id + '" type="button">Editar</button></td></tr>';
+           (bajo ? "BAJO" : "OK") + '</span><br>' +
+           '<button class="boton-editar" data-editar-ing="' + esc(ing.id) + '" type="button">Editar</button> ' +
+           '<button class="boton-editar" data-quitar-ing="' + esc(ing.id) + '" type="button">Quitar</button></td></tr>';
   }).join("");
 
   document.getElementById("tabla-stock").innerHTML =
@@ -403,10 +426,13 @@ function pintarStock() {
   document.querySelectorAll("[data-editar-ing]").forEach(function (boton) {
     boton.addEventListener("click", function () { abrirFormularioIngrediente(boton.dataset.editarIng); });
   });
+  document.querySelectorAll("[data-quitar-ing]").forEach(function (boton) {
+    boton.addEventListener("click", function () { quitarIngrediente(boton.dataset.quitarIng); });
+  });
 
   // Rellenar los desplegables de ingredientes (entrada, recuento y consumo directo)
   const opciones = datos.ingredientes.map(function (ing) {
-    return '<option value="' + ing.id + '">' + ing.nombre + " (" + ing.unidad + ")</option>";
+    return '<option value="' + esc(ing.id) + '">' + esc(ing.nombre) + " (" + esc(ing.unidad) + ")</option>";
   }).join("");
   ["entrada-ingrediente", "recuento-ingrediente", "consumo-ingrediente"].forEach(function (id) {
     const desplegable = document.getElementById(id);
@@ -431,6 +457,34 @@ function actualizarAyudasCampos() {
   }
   if (ingRecuento) document.getElementById("recuento-cantidad").placeholder = "Cantidad real (" + ingRecuento.unidad + ")";
   if (ingConsumo) document.getElementById("consumo-cantidad").placeholder = "Cantidad (" + ingConsumo.unidad + ")";
+}
+
+/* ---------- 10b. Quitar un ingrediente ----------
+   No se puede quitar si algún plato lo usa: se dice cuáles y no se toca nada.
+   Si no lo usa nadie, se pide confirmación y se borra solo el ingrediente;
+   el historial de movimientos se conserva. */
+function platosQueUsan(idIngrediente) {
+  return datos.platos.filter(function (plato) {
+    return plato.ingredientes.some(function (linea) { return linea.ingredienteId === idIngrediente; });
+  });
+}
+
+function quitarIngrediente(id) {
+  const ing = buscarIngrediente(id);
+  if (!ing) return;
+  const usadoEn = platosQueUsan(id);
+  if (usadoEn.length) {
+    return mostrarMensaje("stock-mensaje", "No se puede quitar " + ing.nombre + ": lo usan " +
+      usadoEn.map(function (p) { return p.nombre; }).join(", ") +
+      ". Quítalo primero de esos platos (Editar en Escandallos).", true);
+  }
+  if (!confirm("¿Quitar " + ing.nombre + "? Se borrará el ingrediente y su stock. El historial de movimientos se conserva.")) return;
+  datos.ingredientes = datos.ingredientes.filter(function (i) { return i.id !== id; });
+  apuntarMovimiento("Quitado el ingrediente " + ing.nombre);
+  guardarDatos();
+  cerrarFormularioIngrediente();
+  pintarTodo();
+  mostrarMensaje("stock-mensaje", ing.nombre + " quitado de la lista.");
 }
 
 /* ---------- 11. Formulario de ingrediente (crear y editar) ---------- */
@@ -484,7 +538,7 @@ function guardarIngrediente() {
     const stockInicial = leerNumero("ing-stock-inicial") || 0;
     if (stockInicial < 0) return mostrarMensaje("ing-mensaje", "El stock inicial no puede ser negativo.", true);
     datos.ingredientes.push({
-      id: "ing-" + Date.now(), nombre: nombre, unidad: unidad, merma: merma,
+      id: "ing-" + Date.now(), ejemplo: false, nombre: nombre, unidad: unidad, merma: merma,
       stock: stockInicial, minimo: minimo,
       formato: { nombre: formatoNombre, cantidad: formatoCantidad, precio: formatoPrecio }
     });
@@ -500,7 +554,7 @@ function pintarConsumo() {
   const desplegable = document.getElementById("consumo-plato");
   const valorPrevio = desplegable.value;
   desplegable.innerHTML = datos.platos.map(function (plato) {
-    return '<option value="' + plato.id + '">' + plato.nombre + "</option>";
+    return '<option value="' + esc(plato.id) + '">' + esc(plato.nombre) + "</option>";
   }).join("");
   if (valorPrevio && datos.platos.some(function (p) { return p.id === valorPrevio; })) desplegable.value = valorPrevio;
 }
@@ -509,8 +563,32 @@ function pintarAjustes() {
   document.getElementById("ajuste-umbral").value = datos.ajustes.umbralFoodCost;
 }
 
+function pintarAvisoEjemplo() {
+  /* Tres estados según la marca "ejemplo" de cada elemento:
+     - true:  es un dato de ejemplo de fábrica.
+     - false: lo creó el usuario en la app.
+     - sin marca: procedencia desconocida (copia de seguridad antigua);
+       no se declara ni de ejemplo ni propio: se avisa con cautela. */
+  const aviso = document.querySelector(".aviso-ejemplo");
+  const elementos = datos.ingredientes.concat(datos.platos);
+  const ejemplos = elementos.filter(function (x) { return x.ejemplo === true; }).length;
+  const desconocidos = elementos.filter(function (x) { return x.ejemplo !== true && x.ejemplo !== false; }).length;
+  const propios = elementos.length - ejemplos - desconocidos;
+  if (ejemplos > 0) {
+    aviso.style.display = "";
+    aviso.textContent = (propios + desconocidos > 0 || datos.movimientos.length > 0)
+      ? "Puede seguir habiendo datos de ejemplo (ficticios) mezclados con los tuyos: revísalos en Stock y Escandallos."
+      : "Datos de ejemplo (ficticios): productos y precios inventados para probar la app.";
+  } else if (desconocidos > 0) {
+    aviso.style.display = "";
+    aviso.textContent = "Hay datos de procedencia desconocida (vienen de una copia de seguridad antigua): pueden ser de ejemplo. Revísalos en Stock y Escandallos.";
+  } else {
+    aviso.style.display = "none";
+  }
+}
+
 function pintarTodo(idAbierto) {
-  document.querySelector(".aviso-ejemplo").style.display = datos.ejemploEnUso === false ? "none" : "";
+  pintarAvisoEjemplo();
   pintarInicio();
   pintarEscandallos(idAbierto || null);
   pintarStock();
@@ -520,7 +598,6 @@ function pintarTodo(idAbierto) {
 
 /* ---------- 13. Acciones: entrada, recuento y consumos ---------- */
 function apuntarMovimiento(texto) {
-  datos.ejemploEnUso = false; // ya hay datos propios: se quita el aviso de ejemplo
   datos.movimientos.push({ fecha: ahoraTexto(), texto: texto });
 }
 
@@ -528,6 +605,7 @@ function apuntarMovimiento(texto) {
 // y se suma al stock ya convertido a la unidad base.
 function registrarEntrada() {
   const ing = buscarIngrediente(document.getElementById("entrada-ingrediente").value);
+  if (!ing) return mostrarMensaje("stock-mensaje", "Primero añade un ingrediente con «+ Nuevo ingrediente».", true);
   const formatos = leerNumero("entrada-cantidad");
   if (!formatos || formatos <= 0) {
     return mostrarMensaje("stock-mensaje", "La entrada tiene que ser un número mayor que 0.", true);
@@ -544,6 +622,7 @@ function registrarEntrada() {
 
 function registrarRecuento() {
   const ing = buscarIngrediente(document.getElementById("recuento-ingrediente").value);
+  if (!ing) return mostrarMensaje("stock-mensaje", "Primero añade un ingrediente con «+ Nuevo ingrediente».", true);
   const real = leerNumero("recuento-cantidad");
   if (real === null || real < 0) {
     return mostrarMensaje("stock-mensaje", "El recuento tiene que ser un número igual o mayor que 0.", true);
@@ -559,6 +638,7 @@ function registrarRecuento() {
 
 function registrarConsumoPlato() {
   const plato = datos.platos.find(function (p) { return p.id === document.getElementById("consumo-plato").value; });
+  if (!plato) return mostrarMensaje("consumo-mensaje", "No hay platos creados todavía.", true);
   const raciones = parseInt(document.getElementById("consumo-raciones").value, 10);
   if (!raciones || raciones <= 0) {
     return mostrarMensaje("consumo-mensaje", "Las raciones tienen que ser un número entero mayor que 0.", true);
@@ -587,6 +667,7 @@ function registrarConsumoPlato() {
 
 function registrarConsumoIngrediente() {
   const ing = buscarIngrediente(document.getElementById("consumo-ingrediente").value);
+  if (!ing) return mostrarMensaje("consumo-mensaje", "Primero añade un ingrediente en la pantalla Stock.", true);
   const cantidad = leerNumero("consumo-cantidad");
   if (!cantidad || cantidad <= 0) {
     return mostrarMensaje("consumo-mensaje", "La cantidad tiene que ser mayor que 0.", true);
@@ -638,7 +719,7 @@ function exportarDatos() {
 function validarDatosImportados(d) {
   if (!d || typeof d !== "object") return false;
   if (!d.ajustes || typeof d.ajustes.umbralFoodCost !== "number") return false;
-  if ("ejemploEnUso" in d && typeof d.ejemploEnUso !== "boolean") return false;
+  // la marca ejemplo es opcional en cada ingrediente/plato (las copias antiguas no la tienen)
   if (!Array.isArray(d.ingredientes) || !Array.isArray(d.platos) || !Array.isArray(d.movimientos)) return false;
   const unidades = ["kg", "L", "unidad"];
   const ids = {};
@@ -679,7 +760,6 @@ function importarDatos(evento) {
       evento.target.value = "";
       return;
     }
-    if (datosNuevos.ejemploEnUso !== true) datosNuevos.ejemploEnUso = false; // copia antigua sin el flag: son datos propios
     datos = datosNuevos;
     guardarDatos();
     pintarTodo();
