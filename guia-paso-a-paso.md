@@ -60,7 +60,12 @@ Cada una construye el HTML como texto y lo mete con `innerHTML`. Después se con
 
 El menú solo muestra y oculta secciones (`cambiarVista` cambia la clase `vista--activa`).
 
-## 7. Validaciones (lo que NO deja hacer)
+## 7. Añadir y quitar
+
+- **Añadir**: «+ Nuevo ingrediente» en Stock y «+ Nuevo plato o bebida» en Escandallos. Lo que creas tú se marca como dato propio.
+- **Quitar**: botón «Quitar» en cada ingrediente de Stock. Si algún plato lo usa, NO se quita: te dice qué platos lo usan para que lo retires de ellos primero. Si no lo usa nadie, pide confirmación y borra solo el ingrediente; el historial de movimientos se conserva.
+
+## 8. Validaciones (lo que NO deja hacer)
 
 Antes de guardar nada se comprueba:
 
@@ -69,18 +74,35 @@ Antes de guardar nada se comprueba:
 - Un plato sin nombre, sin precio o sin ingredientes no se guarda.
 - La merma tiene que estar entre 0 y 99.
 
-## 8. Copia de seguridad
+## 9. Copia de seguridad
 
 - **Exportar**: convierte `datos` a JSON y lo descarga como archivo.
 - **Importar**: lee el archivo y lo pasa por `validarDatosImportados`, que revisa que tenga la estructura correcta y que las recetas solo usen ingredientes que existen. Si no vale, no toca nada. Si vale, pide confirmación antes de sustituir tus datos.
 - **Restablecer**: también pide confirmación antes de borrar.
 
-## 9. El aviso de datos de ejemplo
+## 10. El aviso de datos de ejemplo
 
-El cartel "Datos de ejemplo (ficticios)" solo se muestra mientras uses los datos de fábrica (`ejemploEnUso`). En cuanto registras tu primera entrada, consumo, plato o ingrediente, el aviso desaparece solo.
+Cada ingrediente y plato lleva una marca `ejemplo`:
 
-## 10. Ideas para seguir aprendiendo
+- `true`: es un dato de ejemplo de fábrica.
+- `false`: lo creaste tú en la app.
+- Sin marca: procedencia desconocida (una copia de seguridad antigua).
 
-- Añadir borrado de platos e ingredientes (con cuidado: un ingrediente usado en una receta no debería borrarse).
+El cartel amarillo se decide por lo que HAY, no por lo que hiciste:
+
+- Todo es ejemplo → "Datos de ejemplo (ficticios)...".
+- Quedan ejemplos mezclados con lo tuyo → "Puede seguir habiendo datos de ejemplo mezclados con los tuyos...".
+- Hay datos sin marca → aviso de procedencia desconocida (no se adivina si son de ejemplo).
+- Todo marcado como tuyo → el aviso se oculta.
+
+Así, registrar una entrada nunca convierte los ejemplos en reales: el aviso sigue hasta que no quede ninguno.
+
+## 11. Texto seguro (función esc)
+
+Todo nombre que tú escribes o que llega en una copia importada podría contener caracteres especiales. Antes de meterlos en el HTML con `innerHTML`, pasan por `esc()`, que convierte `<`, `>`, `&` y comillas en texto inofensivo. Así un nombre como `<b>pollo</b>` se ve tal cual y nunca se ejecuta como código.
+
+## 12. Ideas para seguir aprendiendo
+
+- Borrado de platos (los ingredientes ya se pueden quitar).
 - Historial de movimientos completo en una pantalla propia.
 - PWA para instalarla en el móvil como app.
