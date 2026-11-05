@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EscandApp - Escandallos y stock para hostelería</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ============ CABECERA CON MENÚ ============ -->
+  <header class="cabecera">
+    <h1 class="cabecera__titulo">EscandApp</h1>
+    <p class="cabecera__lema">Escandallos y stock para bares y restaurantes</p>
+    <nav class="menu">
+      <button class="menu__boton menu__boton--activo" data-vista="inicio">Inicio</button>
+      <button class="menu__boton" data-vista="escandallos">Escandallos</button>
+      <button class="menu__boton" data-vista="stock">Stock</button>
+      <button class="menu__boton" data-vista="consumo">Consumo</button>
+      <button class="menu__boton" data-vista="ajustes">Ajustes</button>
+    </nav>
+  </header>
+
+  <!-- ============ AVISO DE DATOS DE EJEMPLO ============ -->
+  <p class="aviso-ejemplo">Datos de ejemplo (ficticios): productos y precios inventados para probar la app.</p>
+
+  <main class="contenido">
+
+    <!-- ============ VISTA: INICIO ============ -->
+    <section id="vista-inicio" class="vista vista--activa">
+      <h2 class="vista__titulo">Resumen</h2>
+      <div id="tarjetas-resumen" class="tarjetas"></div>
+      <h3 class="seccion__titulo">Alertas de stock bajo</h3>
+      <div id="lista-alertas"></div>
+      <h3 class="seccion__titulo">Últimos movimientos</h3>
+      <div id="lista-movimientos"></div>
+    </section>
+
+    <!-- ============ VISTA: ESCANDALLOS ============ -->
+    <section id="vista-escandallos" class="vista">
+      <h2 class="vista__titulo">Escandallos</h2>
+      <p class="vista__ayuda">Pulsa un plato para ver ingredientes, coste y margen bruto. Todos los precios son sin IVA. El margen bruto no es el beneficio: no cuenta personal, luz, alquiler ni otros costes.</p>
+
+      <button id="boton-nuevo-plato" class="boton boton--secundario">+ Nuevo plato o bebida</button>
+
+      <!-- Formulario para crear o editar un plato (oculto hasta pulsar) -->
+      <div id="panel-plato" class="panel panel--formulario" hidden>
+        <h3 id="panel-plato-titulo" class="panel__titulo">Nuevo plato o bebida</h3>
+        <div class="formulario formulario--vertical">
+          <label class="campo"><span class="campo__etiqueta">Nombre</span>
+            <input id="plato-nombre" class="formulario__campo" type="text" placeholder="Ej.: Albóndigas en salsa"></label>
+          <div class="formulario">
+            <label class="campo"><span class="campo__etiqueta">Tipo</span>
+              <select id="plato-tipo" class="formulario__campo">
+                <option>Plato</option><option>Pincho</option>
+                <option>Postre</option><option>Bebida</option>
+              </select></label>
+            <label class="campo"><span class="campo__etiqueta">Precio de venta (€, sin IVA)</span>
+              <input id="plato-precio" class="formulario__campo" type="number" min="0" step="0.01" placeholder="0,00"></label>
+          </div>
+          <span class="campo__etiqueta">Ingredientes por ración</span>
+          <div id="plato-lineas"></div>
+          <button id="plato-anadir-linea" class="boton boton--secundario" type="button">+ Añadir ingrediente</button>
+          <div id="plato-vista-previa" class="vista-previa"></div>
+          <div class="formulario">
+            <button id="plato-guardar" class="boton" type="button">Guardar</button>
+            <button id="plato-cancelar" class="boton boton--secundario" type="button">Cancelar</button>
+          </div>
+          <div id="plato-mensaje" class="mensaje mensaje--error" hidden></div>
+        </div>
+      </div>
+
+      <div id="lista-escandallos"></div>
+    </section>
+
+    <!-- ============ VISTA: STOCK ============ -->
+    <section id="vista-stock" class="vista">
+      <h2 class="vista__titulo">Ingredientes y stock</h2>
+      <p class="vista__ayuda">Todos los precios son sin IVA.</p>
+
+      <div class="panel">
+        <h3 class="panel__titulo">Entrada de compra</h3>
+        <div class="formulario">
+          <select id="entrada-ingrediente" class="formulario__campo"></select>
+          <input id="entrada-cantidad" class="formulario__campo" type="number" min="0" step="0.01">
+          <button id="entrada-boton" class="boton">Registrar entrada</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3 class="panel__titulo">Recuento (ajustar a lo que hay de verdad)</h3>
+        <div class="formulario">
+          <select id="recuento-ingrediente" class="formulario__campo"></select>
+          <input id="recuento-cantidad" class="formulario__campo" type="number" min="0" step="0.01">
+          <button id="recuento-boton" class="boton">Guardar recuento</button>
+        </div>
+      </div>
+
+      <div id="stock-mensaje" class="mensaje" hidden></div>
+
+      <button id="boton-nuevo-ingrediente" class="boton boton--secundario">+ Nuevo ingrediente</button>
+
+      <!-- Formulario para crear o editar un ingrediente (oculto hasta pulsar) -->
+      <div id="panel-ingrediente" class="panel panel--formulario" hidden>
+        <h3 id="panel-ingrediente-titulo" class="panel__titulo">Nuevo ingrediente</h3>
+        <div class="formulario formulario--vertical">
+          <label class="campo"><span class="campo__etiqueta">Nombre</span>
+            <input id="ing-nombre" class="formulario__campo" type="text" placeholder="Ej.: Harina de trigo"></label>
+          <div class="formulario">
+            <label class="campo"><span class="campo__etiqueta">Se mide en</span>
+              <select id="ing-unidad" class="formulario__campo">
+                <option value="kg">kg</option><option value="L">L</option><option value="unidad">unidades</option>
+              </select></label>
+            <label class="campo"><span class="campo__etiqueta">Merma (% que se pierde del peso bruto)</span>
+              <input id="ing-merma" class="formulario__campo" type="number" min="0" max="99" step="1" value="0"></label>
+          </div>
+          <span class="campo__etiqueta">Cómo se compra (formato)</span>
+          <div class="formulario">
+            <input id="ing-formato-nombre" class="formulario__campo" type="text" placeholder="Ej.: botella de 75 cl">
+            <input id="ing-formato-cantidad" class="formulario__campo campo--estrecho" type="number" min="0" step="0.001" title="Cantidad por formato">
+            <input id="ing-formato-precio" class="formulario__campo campo--estrecho" type="number" min="0" step="0.01" title="Precio por formato">
+          </div>
+          <p class="vista__ayuda" id="ing-formato-ayuda">Cantidad y precio por formato (sin IVA). Ej.: botella de 75 cl = 0,75 L a 3,50 €.</p>
+          <div class="formulario">
+            <label class="campo"><span class="campo__etiqueta">Stock mínimo</span>
+              <input id="ing-minimo" class="formulario__campo" type="number" min="0" step="0.01" value="0"></label>
+            <label class="campo" id="ing-stock-inicial-campo"><span class="campo__etiqueta">Stock inicial</span>
+              <input id="ing-stock-inicial" class="formulario__campo" type="number" min="0" step="0.01" value="0"></label>
+          </div>
+          <div class="formulario">
+            <button id="ing-guardar" class="boton" type="button">Guardar</button>
+            <button id="ing-cancelar" class="boton boton--secundario" type="button">Cancelar</button>
+          </div>
+          <div id="ing-mensaje" class="mensaje mensaje--error" hidden></div>
+        </div>
+      </div>
+
+      <div id="tabla-stock"></div>
+    </section>
+
+    <!-- ============ VISTA: CONSUMO ============ -->
+    <section id="vista-consumo" class="vista">
+      <h2 class="vista__titulo">Registrar consumo</h2>
+      <p class="vista__ayuda">El consumo se apunta a mano: la app no está conectada a ningún TPV. Descuenta la cantidad bruta (lo que sale del almacén, merma incluida).</p>
+
+      <div class="panel">
+        <h3 class="panel__titulo">Por plato (descuenta sus ingredientes)</h3>
+        <div class="formulario">
+          <select id="consumo-plato" class="formulario__campo"></select>
+          <input id="consumo-raciones" class="formulario__campo campo--estrecho" type="number" min="1" step="1" value="1">
+          <button id="consumo-plato-boton" class="boton">Descontar</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3 class="panel__titulo">Directo de ingrediente (mermas, cocina, usos varios)</h3>
+        <div class="formulario">
+          <select id="consumo-ingrediente" class="formulario__campo"></select>
+          <input id="consumo-cantidad" class="formulario__campo campo--estrecho" type="number" min="0" step="0.01">
+          <button id="consumo-ingrediente-boton" class="boton">Descontar</button>
+        </div>
+      </div>
+
+      <div id="consumo-mensaje" class="mensaje" hidden></div>
+    </section>
+
+    <!-- ============ VISTA: AJUSTES ============ -->
+    <section id="vista-ajustes" class="vista">
+      <h2 class="vista__titulo">Ajustes</h2>
+      <div class="panel">
+        <h3 class="panel__titulo">Referencia de food cost</h3>
+        <p class="vista__ayuda">Los platos por encima de este porcentaje se marcan en rojo. Es solo una referencia: cada negocio tiene la suya (un 35 % es un valor de demostración, no una regla).</p>
+        <div class="formulario">
+          <input id="ajuste-umbral" class="formulario__campo campo--estrecho" type="number" min="1" max="99" step="1">
+          <button id="ajuste-guardar" class="boton">Guardar</button>
+        </div>
+        <div id="ajustes-mensaje" class="mensaje" hidden></div>
+      </div>
+      <div class="panel">
+        <h3 class="panel__titulo">Datos</h3>
+        <p class="vista__ayuda">Los datos se guardan en este navegador. Exporta una copia de seguridad para no perderlos.</p>
+        <div class="formulario formulario--vertical">
+          <button id="ajuste-exportar" class="boton boton--secundario" type="button">Exportar copia de seguridad (archivo JSON)</button>
+          <button id="ajuste-importar" class="boton boton--secundario" type="button">Importar copia de seguridad</button>
+          <input id="importar-archivo" type="file" accept=".json,application/json" hidden>
+          <button id="ajuste-restablecer" class="boton boton--secundario" type="button">Restablecer datos de ejemplo</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="pie">
+    <p>EscandApp · prototipo de demostración</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
