@@ -129,6 +129,11 @@ function esc(t) {
                   .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 
+// Redondea el stock a 6 decimales: evita residuos como -0,00000000000000005 tras restar decimales
+function redondearStock(n) {
+  return (Math.round(n * 1e6) / 1e6) || 0; // "|| 0" evita el -0
+}
+
 function buscarIngrediente(id) {
   return datos.ingredientes.find(function (ing) { return ing.id === id; });
 }
@@ -240,7 +245,7 @@ function pintarInicio() {
   document.getElementById("lista-movimientos").innerHTML = ultimos.length
     ? ultimos.map(function (m) {
         return '<div class="movimiento">' + esc(m.texto) +
-               ' <span class="movimiento__fecha">(' + m.fecha + ")</span></div>";
+               ' <span class="movimiento__fecha">(' + esc(m.fecha) + ")</span></div>";
       }).join("")
     : '<p class="sin-alertas">Aún no hay movimientos registrados.</p>';
 }
@@ -627,7 +632,7 @@ function registrarEntrada() {
     return mostrarMensaje("stock-mensaje", "La entrada tiene que ser un número mayor que 0.", true);
   }
   const suma = formatos * ing.formato.cantidad;
-  ing.stock += suma;
+  ing.stock = redondearStock(ing.stock + suma);
   apuntarMovimiento("Entrada: " + numero(formatos) + " × " + ing.formato.nombre + " de " + ing.nombre +
     " (+" + conUnidad(suma, ing.unidad) + ")");
   document.getElementById("entrada-cantidad").value = "";
@@ -645,7 +650,7 @@ function registrarRecuento() {
   }
   apuntarMovimiento("Recuento: " + ing.nombre + " pasa de " + conUnidad(ing.stock, ing.unidad) +
     " a " + conUnidad(real, ing.unidad));
-  ing.stock = real;
+  ing.stock = redondearStock(real);
   document.getElementById("recuento-cantidad").value = "";
   guardarDatos();
   pintarTodo();
@@ -673,7 +678,7 @@ function registrarConsumoPlato() {
   }
   plato.ingredientes.forEach(function (linea) {
     const ing = buscarIngrediente(linea.ingredienteId);
-    ing.stock -= cantidadBruta(linea.cantidad, ing) * raciones;
+    ing.stock = redondearStock(ing.stock - cantidadBruta(linea.cantidad, ing) * raciones);
   });
   apuntarMovimiento("Consumo: " + raciones + " × " + plato.nombre);
   guardarDatos();
@@ -692,7 +697,7 @@ function registrarConsumoIngrediente() {
     return mostrarMensaje("consumo-mensaje", "No hay suficiente " + ing.nombre + ": quedan " +
       conUnidad(ing.stock, ing.unidad) + ".", true);
   }
-  ing.stock -= cantidad;
+  ing.stock = redondearStock(ing.stock - cantidad);
   apuntarMovimiento("Consumo directo: -" + conUnidad(cantidad, ing.unidad) + " de " + ing.nombre);
   document.getElementById("consumo-cantidad").value = "";
   guardarDatos();
@@ -747,16 +752,23 @@ function validarDatosImportados(d) {
   const unidades = ["kg", "L", "unidad"];
   const ids = {};
   for (const ing of d.ingredientes) {
-    if (!ing.id || !ing.nombre || unidades.indexOf(ing.unidad) === -1) return false;
+    if (!ing || !ing.id || !ing.nombre || unidades.indexOf(ing.unidad) === -1) return false;
     if (typeof ing.merma !== "number" || ing.merma < 0 || ing.merma >= 100) return false;
-    if (typeof ing.stock !== "number" || ing.stock < 0) return false;
+    if (typeof ing.stock !== "number" || !isFinite(ing.stock) || ing.stock < -0.000001) return false; // tolera residuos de decimales de copias antiguas
+    if (ids[ing.id]) return false; // id repetido
     if (typeof ing.minimo !== "number" || ing.minimo < 0) return false;
     if (!ing.formato || !ing.formato.nombre) return false;
     if (typeof ing.formato.cantidad !== "number" || ing.formato.cantidad <= 0) return false;
     if (typeof ing.formato.precio !== "number" || ing.formato.precio < 0) return false;
     ids[ing.id] = true;
   }
+  const idsPlatos = {};
+  for (const m of d.movimientos) {
+    if (!m || typeof m.texto !== "string" || typeof m.fecha !== "string") return false;
+  }
   for (const plato of d.platos) {
+    if (!plato || idsPlatos[plato.id]) return false;
+    idsPlatos[plato.id] = true;
     if (!plato.id || !plato.nombre || !plato.tipo) return false;
     if (typeof plato.precioVenta !== "number" || plato.precioVenta <= 0) return false;
     if (!Array.isArray(plato.ingredientes) || !plato.ingredientes.length) return false;
@@ -783,6 +795,7 @@ function importarDatos(evento) {
       evento.target.value = "";
       return;
     }
+    datosNuevos.ingredientes.forEach(function (ing) { ing.stock = redondearStock(ing.stock); }); // limpia residuos
     datos = datosNuevos;
     guardarDatos();
     pintarTodo();
